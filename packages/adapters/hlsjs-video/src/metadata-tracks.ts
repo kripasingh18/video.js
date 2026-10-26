@@ -1,3 +1,4 @@
+
 import type { Constructor } from '@videojs/utils/types';
 import Hls from 'hls.js';
 
@@ -20,7 +21,7 @@ export function HlsJsMetadataTracksMixin<Base extends Constructor<HlsEngineHost>
     }
 
     #forceHiddenTracks(): void {
-      // The hls.js delegate always binds to the real `<video>` element.
+      // The hls.js delegate always binds to the real <video> element.
       const target = this.target as HTMLVideoElement | null;
       if (!target) return;
 
@@ -30,27 +31,14 @@ export function HlsJsMetadataTracksMixin<Base extends Constructor<HlsEngineHost>
         let selector = 'track';
 
         if (track.kind) selector += `[kind="${track.kind}"]`;
-
         if (track.label) selector += `[label="${track.label}"]`;
 
         const trackEl = target.querySelector(selector) as HTMLTrackElement | null;
         if (!trackEl) return;
 
-        const src = trackEl.getAttribute('src') ?? '';
-        const TRACK_LOADED = 2;
-
-        // Only reset the track if it was loaded before and had no cues.
-        if (src && trackEl.readyState === TRACK_LOADED && !track.cues?.length) {
-          const clonedTrackEl = trackEl.cloneNode() as HTMLTrackElement;
-
-          target.replaceChild(clonedTrackEl, trackEl);
-        }
-
-        // Force mode to 'hidden' for default tracks (independent of replacement).
-        const currentTrackEl = target.querySelector(selector) as HTMLTrackElement | null;
-
-        if (currentTrackEl?.default && currentTrackEl.track.mode !== 'hidden') {
-          currentTrackEl.track.mode = 'hidden';
+        // Force mode to 'hidden' for default tracks.
+        if (trackEl.default && trackEl.track.mode !== 'hidden') {
+          trackEl.track.mode = 'hidden';
         }
       });
     }
